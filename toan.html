@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thoát khỏi lâu đài ma ám - Toán lớp 4</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Baloo 2',system-ui,sans-serif;background:#1f1338;color:#F1EFE8;overflow:hidden}
+#scene{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.tw{animation:tw 2.4s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:1}50%{opacity:.25}}
+.fk{animation:fk 1.3s ease-in-out infinite}
+@keyframes fk{0%,100%{opacity:1}35%{opacity:.45}70%{opacity:.85}}
+.spider{animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(40px)}}
+.sghost{animation:float 3.2s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-22px)}}
+.batw{position:fixed;left:0;z-index:1;animation:fly linear infinite;pointer-events:none}
+.batw svg{animation:flap .3s ease-in-out infinite;transform-origin:center}
+@keyframes fly{0%{transform:translate(-90px,0)}25%{transform:translate(25vw,-25px)}50%{transform:translate(50vw,12px)}75%{transform:translate(75vw,-18px)}100%{transform:translate(105vw,0)}}
+@keyframes flap{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.35)}}
+.hud{position:fixed;top:0;left:0;right:0;z-index:5;padding:14px 22px 10px;display:flex;align-items:center;gap:18px}
+.hud .left{min-width:170px}
+.hud .prog{font-size:20px;color:#FAC775;font-weight:700;line-height:1.1}
+.hud .team{font-size:15px;color:#AFA9EC}
+.bar{flex:1;height:10px;background:#2a1a45;border-radius:6px;border:1px solid #534AB7;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:#EF9F27;transition:width .6s}
+.score{font-size:24px;font-weight:700;color:#FAC775;white-space:nowrap;display:flex;align-items:center;gap:10px}
+.score #score{display:inline-block}
+.score .bump{animation:bump .5s}
+@keyframes bump{40%{transform:scale(1.35)}}
+.streak{color:#F0997B;font-size:20px}
+.lives{font-size:28px;letter-spacing:2px;white-space:nowrap}
+.lives span{display:inline-block;transition:filter .3s}
+.lives .gone{filter:grayscale(1) brightness(.45)}
+.lives .pop{animation:lpop .7s}
+@keyframes lpop{0%{transform:scale(1)}40%{transform:scale(1.8) rotate(-20deg)}100%{transform:scale(1)}}
+.snd{background:none;border:2px solid #534AB7;color:#F1EFE8;border-radius:10px;font-size:20px;width:44px;height:40px;cursor:pointer}
+#app{position:relative;z-index:2;height:100%;overflow-y:auto;display:flex;padding:90px 16px 30px}
+.panel{margin:auto;width:min(780px,96vw);background:#2a1a45;border:2px solid #EF9F27;border-radius:20px;padding:26px 32px;box-shadow:0 0 40px rgba(239,159,39,.25)}
+.enter{animation:enter .5s ease-out}
+@keyframes enter{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
+.room{display:flex;align-items:center;gap:10px;font-size:22px;color:#FAC775;font-weight:700;margin-bottom:6px}
+.room .ic{font-size:30px}
+.q{font-size:clamp(20px,2.6vw,27px);line-height:1.45;margin:6px 0 10px}
+.diag{width:100%;max-width:400px;display:block;margin:4px auto 6px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+@media(max-width:600px){.opts{grid-template-columns:1fr}}
+.opt{background:#3a2560;border:2px solid #7F77DD;color:#F1EFE8;border-radius:14px;padding:12px 16px;font:inherit;font-size:22px;text-align:left;cursor:pointer;transition:transform .15s,border-color .2s;display:flex;align-items:center}
+.opt:hover{border-color:#FAC775;transform:translateY(-2px)}
+.opt .k{flex:none;width:36px;height:36px;border-radius:50%;background:#EF9F27;color:#2a1a45;display:inline-flex;align-items:center;justify-content:center;margin-right:12px;font-weight:700;font-size:19px}
+.opt.ok{background:#1D6B45;border-color:#97C459;animation:okpop .5s}
+.opt.bad{background:#5a1a26;border-color:#E24B4A;opacity:.75;cursor:not-allowed;animation:wob .4s}
+.opt.reveal{background:#1D6B45;border:3px dashed #FAC775}
+@keyframes okpop{0%{transform:scale(1)}40%{transform:scale(1.07)}100%{transform:scale(1)}}
+@keyframes wob{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.fb{min-height:30px;margin-top:14px;font-size:19px;line-height:1.5}
+.fb.good{color:#C0DD97}
+.fb.bad{color:#F7C1C1}
+.fb .hint{color:#FAC775}
+.btn{background:#EF9F27;color:#2a1a45;border:none;border-radius:14px;padding:10px 26px;font:inherit;font-size:22px;font-weight:700;cursor:pointer;margin-top:14px;transition:transform .15s}
+.btn:hover{transform:scale(1.05)}
+.btn.ghost{background:none;color:#FAC775;border:2px solid #EF9F27}
+.hide{display:none!important}
+.start{text-align:center}
+.start .big{font-size:80px;display:inline-block;animation:jump 1.4s ease-in-out infinite}
+@keyframes jump{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-16px) rotate(-6deg)}}
+.start h1{font-size:clamp(30px,5vw,46px);color:#FAC775;line-height:1.15;margin:6px 0}
+.start p{font-size:20px;color:#CECBF6;margin-bottom:10px}
+.rules{text-align:left;display:inline-block;font-size:18px;color:#F1EFE8;margin:6px 0 14px;line-height:1.7}
+.start input{font:inherit;font-size:20px;padding:8px 16px;border-radius:12px;border:2px solid #7F77DD;background:#1f1338;color:#F1EFE8;width:min(340px,90%);text-align:center}
+#doors .door{position:fixed;top:0;bottom:0;width:50%;z-index:20;background:repeating-linear-gradient(90deg,#4a2a17 0 58px,#331b0d 58px 64px);transition:transform .55s cubic-bezier(.6,0,.3,1)}
+#doors .l{left:0;transform:translateX(-101%);border-right:5px solid #1a0d06}
+#doors .r{right:0;transform:translateX(101%);border-left:5px solid #1a0d06}
+#doors .l::after,#doors .r::after{content:'';position:absolute;top:50%;width:22px;height:22px;border-radius:50%;background:#EF9F27}
+#doors .l::after{right:26px}
+#doors .r::after{left:26px}
+#doors.closed .door{transform:translateX(0)}
+#scare{position:fixed;inset:0;z-index:25;display:none;align-items:center;justify-content:center;flex-direction:column;pointer-events:none}
+#scare.show{display:flex;animation:flash .9s}
+@keyframes flash{0%{background:rgba(0,0,0,0)}20%{background:rgba(0,0,0,.6)}100%{background:rgba(0,0,0,0)}}
+#scare .sg{animation:boo .9s ease-out forwards;text-align:center}
+#scare .boo{font-size:90px;font-weight:700;color:#F1EFE8;text-shadow:0 0 20px #7F77DD;line-height:1}
+@keyframes boo{0%{transform:scale(.2);opacity:0}30%{transform:scale(1.25);opacity:1}65%{transform:scale(1);opacity:1}100%{transform:scale(1.15);opacity:0}}
+.shake{animation:shake .45s}
+@keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-10px,4px)}40%{transform:translate(9px,-4px)}60%{transform:translate(-7px,2px)}80%{transform:translate(5px,-2px)}}
+.pts{position:fixed;left:50%;top:38%;z-index:35;font-size:60px;font-weight:700;color:#FAC775;pointer-events:none;text-shadow:0 0 18px #EF9F27;white-space:nowrap;animation:up 1.4s ease-out forwards}
+@keyframes up{0%{opacity:0;transform:translate(-50%,20px) scale(.6)}20%{opacity:1;transform:translate(-50%,0) scale(1.15)}100%{opacity:0;transform:translate(-50%,-100px) scale(1)}}
+#modal{position:fixed;inset:0;z-index:30;background:rgba(10,5,20,.78);display:none;align-items:center;justify-content:center;padding:16px}
+#modal.show{display:flex}
+#modal .panel{text-align:center;animation:enter .5s ease-out}
+#modal .big{font-size:84px;line-height:1.1}
+#modal h2{font-size:34px;color:#FAC775;margin:6px 0}
+#modal p{font-size:21px;color:#CECBF6}
+#modal .total{font-size:48px;color:#FAC775;font-weight:700;margin:4px 0}
+#modal .rank{display:inline-block;background:#3a2560;border:2px solid #EF9F27;border-radius:14px;padding:4px 18px;font-size:24px;color:#FAC775;margin:6px 0 10px}
+#modal .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0}
+#modal .stats div{background:#1f1338;border-radius:12px;padding:8px;font-size:16px;color:#CECBF6}
+#modal .stats b{display:block;font-size:28px;color:#F1EFE8}
+#modal .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.cf{position:fixed;top:-60px;z-index:40;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(115vh) rotate(540deg)}}
+</style>
+</head>
+<body>
+
+<svg id="scene" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice">
+  <rect width="1200" height="700" fill="#1f1338"/>
+  <g id="stars" fill="#F1EFE8"></g>
+  <circle cx="1030" cy="130" r="70" fill="#F5E6B8"/>
+  <circle cx="1005" cy="112" r="12" fill="#E8D49A"/>
+  <circle cx="1055" cy="160" r="9" fill="#E8D49A"/>
+  <circle cx="1052" cy="104" r="6" fill="#E8D49A"/>
+  <g class="spider">
+    <line x1="200" y1="-80" x2="200" y2="200" stroke="#B4B2A9" stroke-width="1"/>
+    <g transform="translate(200,206)">
+      <g stroke="#0a0612" stroke-width="2.5" fill="none"><path d="M-8 -4 l-14 -9 M-8 1 l-16 0 M-8 5 l-14 9 M8 -4 l14 -9 M8 1 l16 0 M8 5 l14 9"/></g>
+      <circle r="12" fill="#0a0612"/>
+      <circle cx="-4" cy="-2" r="2.2" fill="#E24B4A"/><circle cx="4" cy="-2" r="2.2" fill="#E24B4A"/>
+    </g>
+  </g>
+  <path d="M0 700 V520 h30 v-24 h14 v24 h14 v-24 h14 v24 h14 V430 h18 l22 -50 l22 50 h18 V560 h30 v-20 h14 v20 h14 v-20 h14 v20 h20 V700Z" fill="#0d0820"/>
+  <rect x="119" y="455" width="14" height="24" rx="7" fill="#FAC775" class="fk"/>
+  <rect x="38" y="560" width="12" height="20" rx="6" fill="#FAC775" class="fk" style="animation-delay:.5s"/>
+  <path d="M0 700 V650 Q300 615 600 640 T1200 630 V700Z" fill="#120a22"/>
+  <g class="sghost">
+    <g transform="translate(990,360)">
+      <path d="M0 80 V35 a38 38 0 0 1 76 0 V80 l-13 -11 l-12 11 l-13 -11 l-12 11 l-13 -11 z" fill="#F1EFE8"/>
+      <ellipse cx="25" cy="35" rx="6" ry="9" fill="#1f1338"/><ellipse cx="51" cy="35" rx="6" ry="9" fill="#1f1338"/>
+      <ellipse cx="38" cy="58" rx="8" ry="6" fill="#1f1338"/>
+    </g>
+  </g>
+  <g transform="translate(1085,632)">
+    <ellipse rx="54" ry="42" fill="#D85A30"/><ellipse rx="22" ry="42" fill="#E8742A"/>
+    <rect x="-6" y="-54" width="12" height="16" rx="3" fill="#3B6D11"/>
+    <g class="fk" fill="#FAC775"><path d="M-30 -10 l13 -13 l6 16z"/><path d="M30 -10 l-13 -13 l-6 16z"/><path d="M-26 12 q26 16 52 0 l-6 10 q-20 10 -40 0z"/></g>
+  </g>
+  <g transform="translate(935,668)">
+    <ellipse rx="28" ry="21" fill="#D85A30"/><rect x="-4" y="-28" width="8" height="10" rx="2" fill="#3B6D11"/>
+    <g class="fk" fill="#FAC775" style="animation-delay:.4s"><circle cx="-9" cy="-4" r="4"/><circle cx="9" cy="-4" r="4"/></g>
+  </g>
+</svg>
+
+<div id="bats"></div>
+
+<div class="hud">
+  <div class="left"><div class="prog" id="prog">Lâu đài ma ám</div><div class="team" id="team"></div></div>
+  <div class="bar"><i id="barIn"></i></div>
+  <div class="score"><span id="score">⭐ 0</span><span class="streak" id="streak"></span></div>
+  <div class="lives" id="lives"></div>
+  <button class="snd" id="snd" title="Bật/tắt âm thanh">🔊</button>
+</div>
+
+<div id="app">
+  <div class="panel start enter" id="start">
+    <div class="big">🎃</div>
+    <h1>Thoát khỏi lâu đài ma ám</h1>
+    <p>Ôn tập Toán lớp 4 · 30 căn phòng · 5 quả bí ngô</p>
+    <div class="rules">
+      🚪 Mỗi căn phòng là một câu hỏi, mỗi câu chỉ được thử <b>2 lần</b>.<br>
+      ⭐ Đúng ngay lần đầu: <b>+100 điểm</b>. Đúng lần thứ hai: <b>+40 điểm</b>.<br>
+      🔥 Đúng liên tiếp ngay lần đầu được thưởng thêm điểm chuỗi.<br>
+      👻 Sai 2 lần: phòng bị ma chiếm, 0 điểm. Mỗi lần sai mất 1 bí ngô.<br>
+      ⌨️ Bấm phím 1–4 để chọn đáp án, Enter để qua phòng.
+    </div><br>
+    <input id="teamName" placeholder="Tên đội (không bắt buộc)" maxlength="30"><br>
+    <button class="btn" id="go">Vào lâu đài 🕯️</button> <a class="btn ghost" href="./" style="text-decoration:none;display:inline-block">🏠 Chọn game khác</a>
+  </div>
+
+  <div class="panel hide" id="game">
+    <div class="room"><span class="ic" id="rIcon">🚪</span><span id="rName">Cổng lâu đài</span></div>
+    <div class="q" id="qText"></div>
+    <div id="diag"></div>
+    <div class="opts" id="opts"></div>
+    <div class="fb" id="fb"></div>
+    <button class="btn hide" id="next">Mở cửa tiếp 🚪</button>
+  </div>
+</div>
+
+<div id="doors"><div class="door l"></div><div class="door r"></div></div>
+
+<div id="scare"><div class="sg">
+  <svg width="260" height="280" viewBox="0 0 76 82"><path d="M0 80 V35 a38 38 0 0 1 76 0 V80 l-13 -11 l-12 11 l-13 -11 l-12 11 l-13 -11 z" fill="#F1EFE8"/><ellipse cx="25" cy="33" rx="7" ry="10" fill="#1f1338"/><ellipse cx="51" cy="33" rx="7" ry="10" fill="#1f1338"/><ellipse cx="38" cy="58" rx="10" ry="12" fill="#1f1338"/></svg>
+  <div class="boo">HÙ!</div>
+</div></div>
+
+<div id="modal"><div class="panel" id="mBody"></div></div>
+
+<script>
+const Q=[
+{q:"Số “Bảy trăm sáu mươi hai triệu ba trăm linh năm nghìn tám trăm mười” được viết là:",o:["762 305 810","762 350 810","762 305 108","726 305 810"],e:"Viết theo từng lớp: 762 triệu | 305 nghìn | 810 → 762 305 810.",h:"“Ba trăm linh năm nghìn” → lớp nghìn là 305."},
+{q:"Chữ số 5 trong số 357 214 có giá trị là bao nhiêu?",o:["50 000","5 000","500 000","500"],e:"Trong số 357 214, chữ số 5 đứng ở hàng chục nghìn nên có giá trị 50 000.",h:"Đếm hàng từ phải sang trái: đơn vị, chục, trăm, nghìn, chục nghìn..."},
+{q:"Chọn số thích hợp: 7 dm² 45 cm² = ...... cm²",o:["745","7 450","7 045","7 405"],e:"1 dm² = 100 cm², nên 7 dm² = 700 cm². 700 + 45 = 745 cm².",h:"1 dm² = 100 cm²."},
+{q:"Một hình chữ nhật có chiều rộng là 18 cm, chiều dài gấp đôi chiều rộng. Tính chu vi hình chữ nhật đó.",o:["108 cm","54 cm","72 cm","648 cm"],r:{w:18,m:2,u:"cm"}},
+{q:"Số bé nhất trong các số 529 368; 529 386; 529 638; 529 836 là:",o:["529 368","529 386","529 638","529 836"],e:"Các số đều bắt đầu bằng 529. So sánh hàng trăm: 3 < 6 < 8, rồi 368 < 386.",h:"Các số giống nhau ở phần đầu, hãy so sánh từ hàng trăm."},
+{q:"Với a = 8, giá trị của biểu thức 345 − 4 × a là:",o:["313","2 728","337","323"],e:"Nhân trước, trừ sau: 4 × 8 = 32; 345 − 32 = 313.",h:"Làm phép nhân trước, phép trừ sau."},
+{q:"Một mảnh vườn hình chữ nhật có chiều rộng 30 m, chiều dài gấp 3 lần chiều rộng. Tính chu vi mảnh vườn đó.",o:["240 m","120 m","180 m","2 700 m"],r:{w:30,m:3,u:"m"}},
+{q:"Có 3 gói bánh, mỗi gói nặng 250 g và 1 hộp kẹo nặng 250 g. Tất cả nặng bao nhiêu?",o:["1 kg","500 g","750 g","10 kg"],e:"Bánh: 250 × 3 = 750 g. Thêm kẹo: 750 + 250 = 1 000 g = 1 kg.",h:"1 kg = 1 000 g."},
+{q:"Năm 2010 là kỷ niệm 1000 năm Thăng Long – Hà Nội. Thăng Long được đặt tên năm nào, năm đó thuộc thế kỷ mấy?",o:["Năm 1010, thế kỷ XI","Năm 1010, thế kỷ X","Năm 1100, thế kỷ XI","Năm 1010, thế kỷ XII"],e:"2010 − 1000 = 1010. Các năm từ 1001 đến 1100 thuộc thế kỷ XI.",h:"Thế kỷ XI gồm các năm từ 1001 đến 1100."},
+{q:"Một hình chữ nhật có chiều dài 24 cm, chiều rộng 9 cm. Chu vi hình chữ nhật đó là:",o:["66 cm","33 cm","216 cm","132 cm"],e:"Chu vi = (dài + rộng) × 2 = (24 + 9) × 2 = 66 cm.",h:"Chu vi = (dài + rộng) × 2."},
+{q:"Lúc 3 giờ đúng, kim giờ và kim phút tạo thành góc gì?",o:["Góc vuông","Góc nhọn","Góc tù","Góc bẹt"],e:"Lúc 3 giờ, kim phút chỉ số 12, kim giờ chỉ số 3, tạo thành góc vuông.",h:"Hãy tưởng tượng kim phút chỉ số 12, kim giờ chỉ số 3."},
+{q:"Một tấm bảng hình chữ nhật có chiều rộng 15 cm, chiều dài gấp đôi chiều rộng. Tính chu vi tấm bảng đó.",o:["90 cm","45 cm","60 cm","450 cm"],r:{w:15,m:2,u:"cm"}},
+{q:"527 846 + 64 379 = ?",o:["592 225","591 225","592 215","582 225"],e:"Đặt tính rồi cộng từ phải sang trái, nhớ sang hàng bên trái. Thử lại: 592 225 − 64 379 = 527 846.",h:"Nhớ đặt thẳng hàng các chữ số cùng hàng."},
+{q:"703 215 − 458 637 = ?",o:["244 578","245 578","244 678","355 422"],e:"Đặt tính rồi trừ từ phải sang trái, nhớ mượn khi cần. Thử lại: 244 578 + 458 637 = 703 215.",h:"Khi chữ số trên bé hơn chữ số dưới, mượn 1 ở hàng bên trái."},
+{q:"Một hình chữ nhật có chiều rộng 12 dm, chiều dài gấp 4 lần chiều rộng. Tính chu vi hình chữ nhật đó.",o:["120 dm","60 dm","96 dm","576 dm"],r:{w:12,m:4,u:"dm"}},
+{q:"4 125 × 8 = ?",o:["33 000","32 000","33 800","3 300"],e:"4 125 × 8 = 33 000. Mẹo: 4 000 × 8 = 32 000 và 125 × 8 = 1 000, cộng lại được 33 000.",h:"Tách 4 125 = 4 000 + 125."},
+{q:"36 288 : 6 = ?",o:["6 048","6 408","648","6 480"],e:"36 288 : 6 = 6 048. Thử lại: 6 048 × 6 = 36 288.",h:"36 : 6 = 6, hạ 2 thì 2 : 6 được 0, đừng quên viết số 0 nhé."},
+{q:"Thư viện có 2 340 quyển truyện tranh. Số sách khoa học gấp 3 lần số truyện tranh. Hỏi thư viện có tất cả bao nhiêu quyển sách khoa học và truyện tranh?",o:["9 360 quyển","7 020 quyển","4 680 quyển","2 343 quyển"],e:"Sách khoa học: 2 340 × 3 = 7 020 quyển. Tất cả: 7 020 + 2 340 = 9 360 quyển.",h:"Bài hỏi “tất cả”, nên tìm số sách khoa học xong phải cộng thêm truyện tranh."},
+{q:"Một hình chữ nhật có chiều rộng là 40 cm, chiều dài gấp đôi chiều rộng. Tính chu vi hình chữ nhật đó.",o:["240 cm","120 cm","160 cm","3 200 cm"],r:{w:40,m:2,u:"cm"}},
+{q:"Một hình vuông có cạnh 9 cm. Chu vi hình vuông đó là:",o:["36 cm","81 cm","18 cm","27 cm"],e:"Chu vi hình vuông = cạnh × 4 = 9 × 4 = 36 cm.",h:"Hình vuông có 4 cạnh bằng nhau."},
+{q:"Trong số 4 682 951, chữ số hàng trăm nghìn là:",o:["6","4","8","2"],e:"4 682 951: hàng triệu là 4, hàng trăm nghìn là 6, hàng chục nghìn là 8.",h:"Lớp nghìn của số này là 682."},
+{q:"Hình chữ nhật có chiều rộng 20 m, chiều dài gấp đôi chiều rộng. Bước 1: Chiều dài hình chữ nhật là bao nhiêu?",o:["40 m","22 m","10 m","80 m"],r:{w:20,m:2,u:"m"},e:"Gấp đôi nghĩa là gấp 2 lần: 20 × 2 = 40 (m). Phòng sau sẽ tính tiếp chu vi!",h:"Gấp đôi nghĩa là nhân với 2."},
+{q:"Bước 2: Hình chữ nhật đó có chiều dài 40 m, chiều rộng 20 m. Chu vi là bao nhiêu?",o:["120 m","60 m","800 m","80 m"],e:"Chu vi = (dài + rộng) × 2 = (40 + 20) × 2 = 120 (m).",h:"Chu vi = (dài + rộng) × 2."},
+{q:"3 tấn 50 kg = ...... kg",o:["3 050","3 500","350","30 050"],e:"1 tấn = 1 000 kg, nên 3 tấn = 3 000 kg. 3 000 + 50 = 3 050 kg.",h:"1 tấn = 1 000 kg."},
+{q:"Một khu vườn hình chữ nhật có chu vi 100 m, chiều dài hơn chiều rộng 10 m. Diện tích khu vườn là:",o:["600 m²","500 m²","1 000 m²","300 m²"],e:"Nửa chu vi: 100 : 2 = 50 m. Chiều dài: (50 + 10) : 2 = 30 m. Chiều rộng: 30 − 10 = 20 m. Diện tích: 30 × 20 = 600 m².",h:"Tìm nửa chu vi trước, rồi dùng bài toán tổng – hiệu."},
+{q:"Một chiếc khăn hình chữ nhật có chiều rộng 35 cm, chiều dài gấp đôi chiều rộng. Tính chu vi chiếc khăn đó.",o:["210 cm","105 cm","140 cm","2 450 cm"],r:{w:35,m:2,u:"cm"}},
+{q:"Năm 2026 thuộc thế kỷ nào?",o:["Thế kỷ XXI","Thế kỷ XX","Thế kỷ XXII","Thế kỷ XIX"],e:"Thế kỷ XXI gồm các năm từ 2001 đến 2100, nên năm 2026 thuộc thế kỷ XXI.",h:"Thế kỷ XXI bắt đầu từ năm 2001."},
+{q:"1 giờ 15 phút = ...... phút",o:["75","115","65","90"],e:"1 giờ = 60 phút. 60 + 15 = 75 phút.",h:"1 giờ = 60 phút."},
+{q:"Tổng của hai số là 90, hiệu của chúng là 16. Số lớn là:",o:["53","37","45","74"],e:"Số lớn = (tổng + hiệu) : 2 = (90 + 16) : 2 = 53. Số bé = 53 − 16 = 37.",h:"Số lớn = (tổng + hiệu) : 2."},
+{q:"Cửa thoát cuối cùng có dạng hình chữ nhật, chiều rộng 45 cm, chiều dài gấp đôi chiều rộng. Tính chu vi cánh cửa đó để thoát ra!",o:["270 cm","135 cm","180 cm","4 050 cm"],r:{w:45,m:2,u:"cm"}}
+];
+const ROOMS=[["🚪","Cổng lâu đài"],["🕸️","Hành lang mạng nhện"],["🪞","Phòng gương vỡ"],["🦇","Hang dơi"],["🧪","Phòng phù thủy"],["🍬","Bếp kẹo ma"],["📚","Thư viện cổ"],["⚰️","Phòng quan tài"],["🕰️","Tháp đồng hồ"],["🕯️","Hầm nến"],["👻","Phòng bóng ma"],["🗝️","Kho chìa khóa"],["🐈‍⬛","Phòng mèo đen"],["🪦","Nghĩa địa sau vườn"],["🌙","Ban công ánh trăng"]];
+const RECT_HINT="Tìm chiều dài trước (chiều rộng × số lần), rồi tính chu vi = (dài + rộng) × 2.";
+const PTS_FIRST=100,PTS_SECOND=40,CONT_PENALTY=100;
+const $=id=>document.getElementById(id);
+let i=0,lives=5,locked=true,busy=false,qDone=false,wrongHere=0,wrongTotal=0,team="",soundOn=true,AC=null;
+let score=0,streak=0,bestStreak=0,firstTry=0,failed=0;
+
+(function(){const g=$('stars');let s='';for(let k=0;k<80;k++){const x=Math.random()*1200,y=Math.random()*460,r=(.6+Math.random()*1.6).toFixed(1);s+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r}" ${k%3?'':'class="tw" style="animation-delay:'+(Math.random()*2).toFixed(1)+'s"'}/>`}g.innerHTML=s;
+const b=$('bats');const bat='<svg width="46" height="26" viewBox="-20 -10 40 18"><path d="M-18 0 Q-10 -10 -4 -2 L0 -6 L4 -2 Q10 -10 18 0 Q10 -2 6 4 Q2 0 0 4 Q-2 0 -6 4 Q-10 -2 -18 0Z" fill="#0a0612"/></svg>';
+[[8,9,0],[16,13,4],[5,11,7],[22,16,2]].forEach(([t,d,dl])=>{const e=document.createElement('div');e.className='batw';e.style.top=t+'vh';e.style.animationDuration=d+'s';e.style.animationDelay=dl+'s';e.innerHTML=bat;b.appendChild(e)})})();
+
+function ac(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC}
+function tone(f,t,d,type,v,f2){if(!soundOn)return;const c=ac(),now=c.currentTime,o=c.createOscillator(),g=c.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,now+t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,now+t+d);g.gain.setValueAtTime(.0001,now+t);g.gain.exponentialRampToValueAtTime(v||.15,now+t+.02);g.gain.exponentialRampToValueAtTime(.0001,now+t+d);o.connect(g);g.connect(c.destination);o.start(now+t);o.stop(now+t+d+.05)}
+const sfx={
+ok(){[523,659,784,1047].forEach((f,k)=>tone(f,k*.09,.28,'triangle',.18))},
+combo(){[784,988,1175,1568].forEach((f,k)=>tone(f,.36+k*.07,.2,'sine',.12))},
+bad(){tone(440,0,.8,'sawtooth',.1,70);tone(330,.05,.8,'square',.05,55)},
+door(){tone(120,0,.6,'sawtooth',.06,60);tone(180,.1,.4,'triangle',.05,90)},
+win(){[392,523,659,784,659,784,1047].forEach((f,k)=>tone(f,k*.16,.32,'triangle',.18))},
+lose(){[330,277,233,196].forEach((f,k)=>tone(f,k*.28,.45,'sawtooth',.08))}};
+$('snd').onclick=()=>{soundOn=!soundOn;$('snd').textContent=soundOn?'🔊':'🔇'};
+
+function shuffle(a){for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a}
+function fmt(n){return n.toLocaleString('vi-VN').replace(/\./g,' ')}
+function explain(it){if(it.e)return it.e;const r=it.r,L=r.w*r.m,P=(L+r.w)*2;return `Bước 1 – Chiều dài: ${r.w} × ${r.m} = ${fmt(L)} (${r.u})<br>Bước 2 – Chu vi: (${fmt(L)} + ${r.w}) × 2 = ${fmt(P)} (${r.u})`}
+function diagram(r){const t=r.m===2?'gấp đôi chiều rộng':'gấp '+r.m+' lần chiều rộng';return `<svg class="diag" viewBox="0 0 400 140"><rect x="125" y="12" width="200" height="88" rx="4" fill="#3a2560" stroke="#FAC775" stroke-width="2" stroke-dasharray="7 5"/><text x="115" y="61" text-anchor="end" fill="#F1EFE8" font-size="17" font-family="inherit">rộng ${r.w} ${r.u}</text><text x="225" y="126" text-anchor="middle" fill="#FAC775" font-size="17" font-family="inherit">dài = ? (${t})</text></svg>`}
+function drawLives(popIdx){let s='';for(let k=0;k<5;k++)s+=`<span class="${k<lives?'':'gone'}${k===popIdx?' pop':''}">🎃</span>`;$('lives').innerHTML=s}
+function drawScore(bump){const s=$('score');s.textContent='⭐ '+fmt(score);if(bump){s.classList.remove('bump');void s.offsetWidth;s.classList.add('bump')}$('streak').textContent=streak>=2?'🔥'+streak:''}
+function popup(t){const s=document.createElement('div');s.className='pts';s.textContent=t;document.body.appendChild(s);setTimeout(()=>s.remove(),1500)}
+function maxScore(){let m=0;for(let s=1;s<=Q.length;s++)m+=PTS_FIRST+(s>=2?Math.min((s-1)*10,50):0);return m}
+
+function render(){
+  locked=false;qDone=false;wrongHere=0;
+  const it=Q[i],rm=i===Q.length-1?["🏁","Cửa thoát cuối cùng"]:ROOMS[i%ROOMS.length];
+  $('rIcon').textContent=rm[0];$('rName').textContent=`Phòng ${i+1}: ${rm[1]}`;
+  $('prog').textContent=`Phòng ${i+1} / ${Q.length}`;
+  $('barIn').style.width=(i/Q.length*100)+'%';
+  $('qText').textContent=it.q;
+  $('diag').innerHTML=it.r?diagram(it.r):'';
+  const box=$('opts');box.innerHTML='';
+  shuffle(it.o.map((t,k)=>({t,ok:k===0}))).forEach((op,k)=>{const b=document.createElement('button');b.className='opt';b.dataset.ok=op.ok?'1':'';b.innerHTML=`<span class="k">${'ABCD'[k]}</span><span>${op.t}</span>`;b.onclick=()=>pick(b,op.ok);box.appendChild(b)});
+  $('fb').innerHTML='';$('fb').className='fb';$('next').classList.add('hide');
+  const g=$('game');g.classList.remove('enter');void g.offsetWidth;g.classList.add('enter');
+}
+function showNext(){$('next').innerHTML=i===Q.length-1?'Thoát khỏi lâu đài 🏃':'Mở cửa tiếp 🚪';$('next').classList.remove('hide')}
+function pick(b,ok){
+  if(locked||b.classList.contains('bad'))return;
+  const it=Q[i];
+  if(ok){
+    locked=true;qDone=true;b.classList.add('ok');sfx.ok();
+    let pts,msg;
+    if(wrongHere===0){
+      streak++;firstTry++;bestStreak=Math.max(bestStreak,streak);
+      const bonus=streak>=2?Math.min((streak-1)*10,50):0;
+      pts=PTS_FIRST+bonus;
+      msg=bonus?`+${PTS_FIRST} điểm, thưởng chuỗi 🔥${streak}: +${bonus}`:`+${PTS_FIRST} điểm`;
+      if(bonus)sfx.combo();
+    }else{
+      streak=0;pts=PTS_SECOND;msg=`Đúng ở lần thử thứ hai: +${PTS_SECOND} điểm`;
+    }
+    score+=pts;popup('+'+pts);drawScore(true);
+    $('fb').className='fb good';
+    $('fb').innerHTML=`<b>Chính xác! ${msg}</b><br>`+explain(it);
+    showNext();
+  }else{
+    b.classList.add('bad');wrongHere++;wrongTotal++;lives--;streak=0;
+    sfx.bad();scare();drawLives(lives);drawScore(false);
+    $('fb').className='fb bad';
+    if(wrongHere>=2){
+      locked=true;qDone=true;failed++;
+      $('opts').querySelectorAll('.opt').forEach(x=>{if(x.dataset.ok)x.classList.add('reveal')});
+      $('fb').innerHTML=`<b>Con ma đã chiếm căn phòng này! 0 điểm.</b><br>Đáp án đúng là: <b>${it.o[0]}</b><br>`+explain(it);
+      showNext();
+    }else{
+      const hint=it.h||(it.r?RECT_HINT:'');
+      $('fb').innerHTML=`<b>Hù! Con ma vừa lấy mất một quả bí ngô.</b> Còn 1 lần thử (đúng được +${PTS_SECOND} điểm).`+(hint?`<br><span class="hint">💡 Gợi ý: ${hint}</span>`:'');
+    }
+    if(lives<=0){locked=true;setTimeout(lost,1000)}
+  }
+}
+function scare(){const s=$('scare');s.classList.remove('show');void s.offsetWidth;s.classList.add('show');const a=$('app');a.classList.remove('shake');void a.offsetWidth;a.classList.add('shake');setTimeout(()=>s.classList.remove('show'),950)}
+function next(){
+  if(!qDone||busy||lives<=0)return;busy=true;sfx.door();
+  $('doors').classList.add('closed');
+  setTimeout(()=>{
+    if(i===Q.length-1){$('doors').classList.remove('closed');busy=false;win();return}
+    i++;render();$('doors').classList.remove('closed');setTimeout(()=>busy=false,500);
+  },650);
+}
+$('next').onclick=next;
+function modal(html){$('mBody').innerHTML=html;$('modal').classList.add('show')}
+function closeModal(){$('modal').classList.remove('show')}
+function lost(){
+  sfx.lose();
+  modal(`<div class="big">👻</div><h2>Bị nhốt trong lâu đài!</h2><p>Hết bí ngô ở phòng ${i+1}. Muốn đi tiếp phải nộp ${CONT_PENALTY} điểm cho con ma.</p><div class="row"><button class="btn" id="mCont">Tiếp tục với 3 bí ngô (−${CONT_PENALTY} điểm)</button><button class="btn ghost" id="mRe">Chơi lại từ đầu</button></div>`);
+  $('mCont').onclick=()=>{lives=3;score=Math.max(0,score-CONT_PENALTY);drawLives();drawScore(true);locked=qDone;closeModal()};
+  $('mRe').onclick=restart;
+}
+function rankOf(){const p=firstTry/Q.length;return p>=.9?['🏆','Thợ săn ma huyền thoại']:p>=.7?['🧙','Phù thủy toán học']:p>=.5?['🎃','Hiệp sĩ bí ngô']:['👻','Ma con tập sự']}
+function win(){
+  $('barIn').style.width='100%';sfx.win();confetti();
+  const rk=rankOf(),who=team?'Đội '+team.replace(/</g,''):'Cả lớp';
+  modal(`<div class="big">${rk[0]}</div><h2>${who} đã thoát khỏi lâu đài!</h2><div class="rank">Danh hiệu: ${rk[1]}</div><div class="total">⭐ ${fmt(score)} <span style="font-size:22px;color:#CECBF6">/ ${fmt(maxScore())} điểm</span></div><div class="stats"><div><b>${firstTry}/${Q.length}</b>Đúng ngay lần đầu</div><div><b>🔥${bestStreak}</b>Chuỗi dài nhất</div><div><b>${failed}</b>Phòng bị ma chiếm</div></div><p>Happy Halloween! 🎃</p><div class="row"><button class="btn" id="mRe">Chơi lại</button> <a class="btn ghost" href="./" style="text-decoration:none;display:inline-block">🏠 Chọn game khác</a></div>`);
+  $('mRe').onclick=restart;
+}
+function restart(){closeModal();i=0;lives=5;wrongTotal=0;score=0;streak=0;bestStreak=0;firstTry=0;failed=0;busy=false;drawLives();drawScore(false);render()}
+function confetti(){const em=['🍬','🍭','🎃','🦇','⭐','🍫','👻'];for(let k=0;k<80;k++){const s=document.createElement('span');s.className='cf';s.textContent=em[k%em.length];s.style.left=(Math.random()*100)+'vw';s.style.fontSize=(18+Math.random()*24)+'px';s.style.animationDuration=(2.5+Math.random()*3)+'s';s.style.animationDelay=(Math.random()*1.5)+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),7500)}}
+
+$('go').onclick=()=>{
+  team=$('teamName').value.trim();
+  $('team').textContent=team?'Đội: '+team:'';
+  ac();sfx.door();
+  $('start').classList.add('hide');$('game').classList.remove('hide');
+  drawLives();drawScore(false);render();
+};
+$('teamName').addEventListener('keydown',e=>{if(e.key==='Enter')$('go').click()});
+document.addEventListener('keydown',e=>{
+  if($('game').classList.contains('hide')||$('modal').classList.contains('show'))return;
+  const m={'1':0,'2':1,'3':2,'4':3,'a':0,'b':1,'c':2,'d':3}[e.key.toLowerCase()];
+  if(m!==undefined){const bs=$('opts').querySelectorAll('.opt');if(bs[m])bs[m].click()}
+  if(e.key==='Enter'&&!$('next').classList.contains('hide'))next();
+});
+drawLives();drawScore(false);
+</script>
+</body>
+</html>
