@@ -57,7 +57,14 @@ html,body{min-height:100%;font-family:var(--font);background:var(--night);color:
 .snd-btn:hover{transform:scale(1.08)}
 
 /* Mode Tabs */
-.nav-bar{max-width:980px;margin:12px auto 0;padding:0 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.unit-bar{position:relative;z-index:2;max-width:980px;margin:10px auto 0;padding:0 16px;display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none}
+.unit-bar::-webkit-scrollbar{display:none}
+.unit-label{font-size:14px;color:var(--soft);font-weight:700;white-space:nowrap}
+.unit-link{text-decoration:none;background:var(--panel);border:1px solid var(--lilac);color:var(--soft);border-radius:20px;padding:4px 13px;font-size:14px;font-weight:700;white-space:nowrap;transition:all .15s}
+.unit-link:hover{border-color:var(--gold);color:var(--ink);transform:translateY(-1px)}
+.unit-link.current{background:var(--lilac);color:#fff;border-color:var(--gold);box-shadow:0 0 12px rgba(127,119,221,.45)}
+
+.nav-bar{position:relative;z-index:2;max-width:980px;margin:12px auto 0;padding:0 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
 .nav-bar::-webkit-scrollbar{display:none}
 .tab-btn{flex:1;min-width:130px;background:var(--panel);border:2px solid var(--line);color:var(--soft);border-radius:14px;padding:9px 12px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;transition:all .18s}
 .tab-btn:hover{border-color:var(--pumpkin);color:var(--ink);transform:translateY(-2px)}
@@ -227,6 +234,16 @@ html,body{min-height:100%;font-family:var(--font);background:var(--night);color:
     <button class="snd-btn" id="sndToggle" title="Bật/Tắt âm thanh">🔊</button>
   </div>
 </header>
+
+<!-- Unit Switcher -->
+<div class="unit-bar">
+  <span class="unit-label">Chuyển Unit:</span>
+  <a href="tieng-anh.html" class="unit-link current">🏡 Unit 6 &amp; 7 (Cơ bản)</a>
+  <a href="tieng-anh-unit-7.html" class="unit-link">📅 Unit 7: Timetables</a>
+  <a href="tieng-anh-unit-8.html" class="unit-link">🎨 Unit 8: Subjects</a>
+  <a href="tieng-anh-unit-9.html" class="unit-link">🏅 Unit 9: Sports day</a>
+  <a href="tieng-anh-unit-10.html" class="unit-link">🏖️ Unit 10: Holidays</a>
+</div>
 
 <!-- Game Navigation Modes -->
 <nav class="nav-bar">

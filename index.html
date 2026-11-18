@@ -8,44 +8,84 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{min-height:100%}
-body{font-family:'Baloo 2',system-ui,sans-serif;background:#1f1338;color:#F1EFE8;display:flex;align-items:center;justify-content:center;padding:24px 16px;min-height:100vh}
-.wrap{width:min(960px,100%);text-align:center}
+body{font-family:'Baloo 2',system-ui,sans-serif;background:#1f1338;color:#F1EFE8;display:flex;align-items:center;justify-content:center;padding:28px 16px 40px;min-height:100vh}
+.wrap{width:min(1060px,100%);text-align:center}
 .big{font-size:64px;display:inline-block;animation:jump 1.4s ease-in-out infinite}
 @keyframes jump{50%{transform:translateY(-14px) rotate(-6deg)}}
 h1{font-size:clamp(30px,5vw,46px);color:#FAC775;line-height:1.15;margin:4px 0}
-.sub{font-size:20px;color:#CECBF6;margin-bottom:24px}
+.sub{font-size:20px;color:#CECBF6;margin-bottom:22px}
+.sec-title{display:flex;align-items:center;justify-content:center;gap:10px;font-size:clamp(22px,3.2vw,28px);color:#FAC775;font-weight:800;margin:30px 0 14px}
+.sec-sub{font-size:16px;color:#CECBF6;margin:-8px 0 18px}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
-.card{display:block;text-decoration:none;color:inherit;background:#2a1a45;border:2px solid #EF9F27;border-radius:20px;padding:24px;box-shadow:0 0 30px rgba(239,159,39,.2);transition:transform .15s,box-shadow .15s}
-.card:hover,.card:focus-visible{transform:translateY(-4px) scale(1.02);box-shadow:0 0 40px rgba(239,159,39,.45);outline:none}
-.card .ic{font-size:60px;line-height:1.1}
-.card h2{font-size:26px;color:#FAC775;margin:6px 0}
-.card p{font-size:17px;color:#CECBF6;line-height:1.5;margin-bottom:14px}
-.card .go{display:inline-block;background:#EF9F27;color:#2a1a45;border-radius:14px;padding:8px 22px;font-size:20px;font-weight:700}
+.cards.en-grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:inherit;background:#2a1a45;border:2px solid #EF9F27;border-radius:20px;padding:22px 20px;box-shadow:0 0 30px rgba(239,159,39,.2);transition:transform .15s,box-shadow .15s,border-color .15s;position:relative}
+.card:hover,.card:focus-visible{transform:translateY(-4px) scale(1.02);box-shadow:0 0 40px rgba(239,159,39,.45);border-color:#FAC775;outline:none}
+.card .tag{font-size:12px;font-weight:800;color:#FAC775;background:#140c26;border:1px solid #7F77DD;border-radius:999px;padding:2px 10px;margin-bottom:6px;letter-spacing:.02em}
+.card .ic{font-size:56px;line-height:1.1}
+.card h2{font-size:24px;color:#FAC775;margin:6px 0;line-height:1.2}
+.card p{font-size:16px;color:#CECBF6;line-height:1.45;margin-bottom:16px;flex:1}
+.card .go{display:inline-block;background:#EF9F27;color:#2a1a45;border-radius:14px;padding:8px 22px;font-size:19px;font-weight:800}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="big">🎃</div>
   <h1>Lâu đài ma · Lớp 4</h1>
-  <p class="sub">Chọn trò chơi em muốn chơi</p>
+  <p class="sub">Chọn trò chơi hoặc bài học em muốn chinh phục</p>
+
   <div class="cards">
     <a class="card" href="toan.html">
       <div class="ic">🧮</div>
       <h2>Thoát khỏi lâu đài ma ám</h2>
-      <p>Giải toán để mở từng cánh cửa và thoát ra ngoài.</p>
+      <p>Giải toán lớp 4 để mở từng cánh cửa bí ẩn và thoát ra ngoài.</p>
       <span class="go">Chơi toán ➜</span>
     </a>
     <a class="card" href="san-do.html">
       <div class="ic">🔦</div>
       <h2>Săn đồ trong lâu đài ma</h2>
-      <p>Tìm đồ vật bị giấu trong căn phòng lộn xộn. Có 30 vòng.</p>
+      <p>Tìm đồ vật bị giấu trong căn phòng lộn xộn. Có 30 vòng thử thách.</p>
       <span class="go">Tìm đồ vật ➜</span>
     </a>
+  </div>
+
+  <div class="sec-title">🧙‍♂️ Phù thủy Tiếng Anh · Theo từng Unit</div>
+  <p class="sec-sub">SGK Tiếng Anh Lớp 4 Global Success · Luyện phát âm, nối từ, lật thẻ, ghép chữ &amp; độc dược mẫu câu</p>
+
+  <div class="cards en-grid">
     <a class="card" href="tieng-anh.html">
-      <div class="ic">🧙‍♂️</div>
-      <h2>Phù thủy tiếng Anh</h2>
-      <p>Luyện phát âm, nối từ, lật thẻ và ghép chữ 15 từ vựng Unit 6 &amp; 7.</p>
-      <span class="go">Học tiếng Anh ➜</span>
+      <span class="tag">UNIT 6 &amp; 7 · MỞ ĐẦU</span>
+      <div class="ic">🏡</div>
+      <h2>Our school facilities</h2>
+      <p>Trường học, làng quê &amp; môn học cơ bản (15 từ vựng).</p>
+      <span class="go">Học Unit 6 ➜</span>
+    </a>
+    <a class="card" href="tieng-anh-unit-7.html">
+      <span class="tag">SGK LỚP 4 · UNIT 7</span>
+      <div class="ic">📅</div>
+      <h2>Our timetables</h2>
+      <p>Thời khóa biểu &amp; trọn bộ các môn học trên lớp (12 từ vựng &amp; mẫu câu).</p>
+      <span class="go">Học Unit 7 ➜</span>
+    </a>
+    <a class="card" href="tieng-anh-unit-8.html">
+      <span class="tag">SGK LỚP 4 · UNIT 8</span>
+      <div class="ic">🎨</div>
+      <h2>My favourite subjects</h2>
+      <p>Môn học yêu thích, nghề nghiệp mơ ước &amp; hỏi đáp Why – Because (13 từ vựng).</p>
+      <span class="go">Học Unit 8 ➜</span>
+    </a>
+    <a class="card" href="tieng-anh-unit-9.html">
+      <span class="tag">SGK LỚP 4 · UNIT 9</span>
+      <div class="ic">🏅</div>
+      <h2>Our sports day</h2>
+      <p>Ngày hội thể thao của trường, các tháng 6–12 &amp; môn thi đấu (12 từ vựng).</p>
+      <span class="go">Học Unit 9 ➜</span>
+    </a>
+    <a class="card" href="tieng-anh-unit-10.html">
+      <span class="tag">SGK LỚP 4 · UNIT 10</span>
+      <div class="ic">🏖️</div>
+      <h2>Our summer holidays</h2>
+      <p>Kỳ nghỉ hè, các thành phố nổi tiếng thế giới &amp; quá khứ Was/Were (14 từ vựng).</p>
+      <span class="go">Học Unit 10 ➜</span>
     </a>
   </div>
 </div>
