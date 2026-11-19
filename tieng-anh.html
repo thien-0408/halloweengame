@@ -952,6 +952,7 @@ function initMemory() {
   memCards.forEach((c, idx) => {
     const cardEl = document.createElement('div');
     cardEl.className = 'memory-card';
+    cardEl.dataset.card = JSON.stringify(c);
     cardEl.innerHTML = `<div class="card-back">🎃</div>`;
     cardEl.onclick = () => flipMemoryCard(cardEl, c, idx);
     board.appendChild(cardEl);
@@ -1348,64 +1349,7 @@ document.addEventListener('keydown', (e) => {
 /* ================= INITIALIZATION ================= */
 renderFlashcards();
 
-// L?u ti?n ?? tr?n tr?nh duy?t c?a h?c sinh, ri?ng cho t?ng trang.
-(function () {
-  const key = 'halloween-progress-v1:' + location.pathname;
-  const hasCauldron = false;
-  function saveProgress() {
-    try {
-      if (activeTab !== 'quiz' && !(hasCauldron && activeTab === 'cauldron')) return;
-      const quiz = activeTab === 'quiz';
-      const prefix = quiz ? 'quiz' : 'caul';
-      const state = { tab: activeTab, score, streak,
-        list: quiz ? quizQuestions : caulList,
-        index: quiz ? quizIdx : caulIdx,
-        answered: quiz ? quizAnswered : caulAnswered,
-        lives: quiz ? quizLives : null };
-      if (state.answered) {
-        state.options = document.getElementById(prefix + 'Opts').innerHTML;
-        state.feedback = document.getElementById(prefix + 'Feedback').outerHTML;
-        if (!quiz) {
-          state.tip = document.getElementById('caulTip').outerHTML;
-          state.sentence = document.getElementById('caulEn').innerHTML;
-        }
-      }
-      localStorage.setItem(key, JSON.stringify(state));
-    } catch (_) { /* Tr?nh duy?t c? th? ch?n l?u tr?. */ }
-  }
-  try {
-    const saved = JSON.parse(localStorage.getItem(key) || 'null');
-    if (saved && Array.isArray(saved.list) && saved.list.length &&
-        Number.isInteger(saved.index) && saved.index >= 0 && saved.index <= saved.list.length &&
-        (saved.tab === 'quiz' || (hasCauldron && saved.tab === 'cauldron'))) {
-      document.querySelector('.tab-btn[data-tab="' + saved.tab + '"]').click();
-      score = saved.score || 0; streak = saved.streak || 0;
-      document.getElementById('scoreVal').textContent = score.toLocaleString();
-      document.getElementById('streakVal').textContent = streak;
-      if (saved.tab === 'quiz') {
-        quizQuestions = saved.list; quizIdx = saved.index; quizLives = saved.lives;
-        drawQuizLives(); loadQuizQuestion(); quizAnswered = !!saved.answered;
-      } else {
-        caulList = saved.list; caulIdx = saved.index;
-        loadCauldron(); caulAnswered = !!saved.answered;
-      }
-      if (saved.answered && saved.index < saved.list.length) {
-        const prefix = saved.tab === 'quiz' ? 'quiz' : 'caul';
-        document.getElementById(prefix + 'Opts').innerHTML = saved.options;
-        document.getElementById(prefix + 'Feedback').outerHTML = saved.feedback;
-        if (saved.tab === 'cauldron') {
-          document.getElementById('caulTip').outerHTML = saved.tip;
-          document.getElementById('caulEn').innerHTML = saved.sentence;
-        }
-        if (saved.tab !== 'quiz' || quizLives > 0) document.getElementById(prefix + 'NextBtn').classList.remove('hide');
-        else showModal({ icon: '??', title: 'H?t b? ng? r?i!', scoreText: 'Th? s?c l?i nh?!',
-          msg: 'Em h?y ch?i l?i ?? th? s?c nh?!', onPlayAgain: initQuiz });
-      }
-    }
-  } catch (_) { /* D? li?u c? ho?c kh?ng h?p l?: b?t ??u b?nh th??ng. */ }
-  document.addEventListener('click', saveProgress);
-  window.addEventListener('pagehide', saveProgress);
-})();
 </script>
+<script src="english-progress.js"></script>
 </body>
 </html>
